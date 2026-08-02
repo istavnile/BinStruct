@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderTree, Settings, LogOut } from "lucide-react";
+import { FolderTree, Settings, LogOut, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 import type { Lang } from "@/lib/lang";
+import { HelpModal, useHelpAutoOpen } from "@/components/HelpModal";
 
 const NAV = {
   es: [
@@ -21,6 +23,9 @@ const NAV = {
 export function Sidebar({ lang = "es" }: { lang?: Lang }) {
   const pathname = usePathname();
   const navigation = NAV[lang];
+  const [helpAutoOpen, setHelpAutoOpen] = useHelpAutoOpen();
+  const [helpOpen, setHelpOpen] = useState(false);
+  const isHelpOpen = helpAutoOpen || helpOpen;
 
   return (
     <aside className="relative flex h-screen w-56 shrink-0 flex-col border-r border-[#1c2232] bg-[#080a0f] overflow-hidden">
@@ -63,8 +68,15 @@ export function Sidebar({ lang = "es" }: { lang?: Lang }) {
         })}
       </div>
 
-      {/* Sign out */}
-      <div className="relative z-10 border-t border-[#1c2232] px-3 py-3">
+      {/* Help + Sign out */}
+      <div className="relative z-10 border-t border-[#1c2232] px-3 py-3 space-y-0.5">
+        <button
+          onClick={() => setHelpOpen(true)}
+          className="group flex w-full items-center gap-2.5 py-2 pl-[6px] pr-2 font-mono text-xs font-medium tracking-wide text-[#3d4f60] transition-all duration-100 border-l-2 border-transparent hover:text-[#c9d5e0] hover:border-[#3d4f60] hover:bg-[#1c2232]/30"
+        >
+          <HelpCircle className="h-3.5 w-3.5 shrink-0" />
+          <span>{lang === "en" ? "help" : "ayuda"}</span>
+        </button>
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="group flex w-full items-center gap-2.5 py-2 pl-[6px] pr-2 font-mono text-xs font-medium tracking-wide text-[#3d4f60] transition-all duration-100 border-l-2 border-transparent hover:text-[#ff4545] hover:border-[#ff4545]/60 hover:bg-[#ff4545]/5"
@@ -73,6 +85,12 @@ export function Sidebar({ lang = "es" }: { lang?: Lang }) {
           <span>$ logout</span>
         </button>
       </div>
+
+      <HelpModal
+        open={isHelpOpen}
+        onOpenChange={(v) => { setHelpAutoOpen(v); setHelpOpen(v); }}
+        lang={lang}
+      />
     </aside>
   );
 }
