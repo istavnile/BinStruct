@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -56,6 +56,31 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
   const [saving, setSaving] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(tree._id || null);
   const [isCreateOnDiskOpen, setIsCreateOnDiskOpen] = useState(false);
+
+  const [treeWidth, setTreeWidth] = useState(220);
+  const isResizing = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartWidth = useRef(0);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!isResizing.current) return;
+      const delta = e.clientX - dragStartX.current;
+      setTreeWidth(Math.max(160, Math.min(520, dragStartWidth.current + delta)));
+    };
+    const onUp = () => {
+      if (!isResizing.current) return;
+      isResizing.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
@@ -206,7 +231,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
           )}
 
           <span
-            className={`font-mono flex-1 truncate max-w-[160px] transition-colors ${depth === 1 ? "text-[11px] font-medium" : "text-[11px]"}`}
+            className={`font-mono flex-1 min-w-0 truncate transition-colors ${depth === 1 ? "text-[11px] font-medium" : "text-[11px]"}`}
             style={{ color: nameColor }}
           >
             {node.name}
@@ -303,7 +328,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
       {/* ── IDE layout ───────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden border-b border-[#1c2232]">
         {/* Tree panel */}
-        <div className="w-[220px] shrink-0 border-r border-[#1c2232] bg-[#080a0f] flex flex-col">
+        <div className="shrink-0 border-r border-[#1c2232] bg-[#080a0f] flex flex-col" style={{ width: treeWidth }}>
           <div className="border-b border-[#1c2232] px-3 py-2 flex items-center justify-between">
             <span className="font-mono text-[9px] font-bold tracking-[0.2em] text-[#3d4f60]">// ESTRUCTURA</span>
             <button
@@ -317,6 +342,21 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
           <div className="flex-1 overflow-y-auto py-1">
             {renderTree(tree)}
           </div>
+        </div>
+
+        {/* Resize handle */}
+        <div
+          className="w-[4px] shrink-0 cursor-col-resize group relative z-10 hover:bg-[#00ff9d]/10 active:bg-[#00ff9d]/15 transition-colors"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            isResizing.current = true;
+            dragStartX.current = e.clientX;
+            dragStartWidth.current = treeWidth;
+            document.body.style.cursor = "col-resize";
+            document.body.style.userSelect = "none";
+          }}
+        >
+          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-transparent group-hover:bg-[#00ff9d]/30 transition-colors" />
         </div>
 
         {/* Editor panel */}
