@@ -555,8 +555,8 @@ export function TemplatesClient({ initialTemplates, lang = "es" }: { initialTemp
                       {template.name}
                     </Link>
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-[#3d4f60] py-3 max-w-[200px] truncate">{template.description || "—"}</TableCell>
-                  <TableCell className="font-mono text-xs text-[#3d4f60] py-3" suppressHydrationWarning>
+                  <TableCell className="font-mono text-xs text-[#5a7080] py-3 max-w-[200px] truncate">{template.description || "—"}</TableCell>
+                  <TableCell className="font-mono text-xs text-[#5a7080] py-3" suppressHydrationWarning>
                     {formatDistanceToNow(new Date(template.updatedAt), { addSuffix: true, locale: lang === "es" ? esLocale : undefined })}
                   </TableCell>
                   <TableCell className="text-right px-5 py-3">
