@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { updateTemplate } from "@/actions/templates";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => crypto.randomUUID();
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Link from "next/link";
