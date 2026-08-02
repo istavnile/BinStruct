@@ -58,6 +58,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
   const [isCreateOnDiskOpen, setIsCreateOnDiskOpen] = useState(false);
 
   const [treeWidth, setTreeWidth] = useState(280);
+  const [isDragging, setIsDragging] = useState(false);
   const isResizing = useRef(false);
   const dragStartX = useRef(0);
   const dragStartWidth = useRef(0);
@@ -71,6 +72,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
     const onUp = () => {
       if (!isResizing.current) return;
       isResizing.current = false;
+      setIsDragging(false);
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
@@ -328,8 +330,14 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
       {/* ── IDE layout ───────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden border-b border-[#1c2232] relative">
         {/* Tree panel */}
-        <div className="shrink-0 border-r border-[#1c2232] bg-[#080a0f] flex flex-col" style={{ width: treeWidth }}>
-          <div className="border-b border-[#1c2232] px-3 py-2 flex items-center justify-between">
+        <div
+          className="shrink-0 bg-[#080a0f] flex flex-col transition-colors"
+          style={{
+            width: treeWidth,
+            borderRight: `1px solid ${isDragging ? "#00ff9d40" : "#1c2232"}`,
+          }}
+        >
+          <div className="border-b border-[#1c2232] px-3 h-9 flex items-center justify-between shrink-0">
             <span className="font-mono text-[9px] font-bold tracking-[0.2em] text-[#3d4f60]">// ESTRUCTURA</span>
             <button
               onClick={() => addNode(tree._id!, "folder")}
@@ -353,6 +361,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
             isResizing.current = true;
             dragStartX.current = e.clientX;
             dragStartWidth.current = treeWidth;
+            setIsDragging(true);
             document.body.style.cursor = "col-resize";
             document.body.style.userSelect = "none";
           }}
@@ -363,7 +372,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
           {selectedNode ? (
             <>
               {/* Editor header */}
-              <div className="border-b border-[#1c2232] px-4 py-2 flex items-center gap-2 shrink-0">
+              <div className="border-b border-[#1c2232] px-4 h-9 flex items-center gap-2 shrink-0">
                 {selectedNode.type === "folder"
                   ? <Folder size={12} className="text-[#00ff9d]" />
                   : <File size={12} className="text-[#00d4ff]" />
