@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -79,6 +79,52 @@ export function TemplatesClient({ initialTemplates, lang = "es" }: { initialTemp
   const [exportModal, setExportModal] = useState<{ template: any; mode: "disk" | "zip"; rootName: string; vars: Record<string, string> } | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
   const [search, setSearch] = useState("");
+
+  // ── Resizable columns ──────────────────────────────────────────────────
+  const [colWidths, setColWidths] = useState<[number, number]>([300, 420]);
+  const [isDraggingCol, setIsDraggingCol] = useState<number | null>(null);
+  const colWidthsRef = useRef<[number, number]>([300, 420]);
+  const isResizingCol = useRef<number | null>(null);
+  const resizeStartX = useRef(0);
+  const resizeStartWidth = useRef(0);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("binstruct:col-widths");
+      if (saved) {
+        const parsed = JSON.parse(saved) as [number, number];
+        colWidthsRef.current = parsed;
+        setColWidths(parsed);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (isResizingCol.current === null) return;
+      const delta = e.clientX - resizeStartX.current;
+      const idx = isResizingCol.current;
+      const newWidth = Math.max(120, resizeStartWidth.current + delta);
+      const next: [number, number] = [colWidthsRef.current[0], colWidthsRef.current[1]];
+      next[idx] = newWidth;
+      colWidthsRef.current = next;
+      setColWidths([...next]);
+    };
+    const onUp = () => {
+      if (isResizingCol.current === null) return;
+      isResizingCol.current = null;
+      setIsDraggingCol(null);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      try { localStorage.setItem("binstruct:col-widths", JSON.stringify(colWidthsRef.current)); } catch {}
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+  }, []);
 
   /* ── Open create dialog from preset or blank ── */
   const openPreset = (preset: PresetTemplate | null) => {
@@ -509,13 +555,59 @@ export function TemplatesClient({ initialTemplates, lang = "es" }: { initialTemp
 
       {/* ── Templates table ─────────────────────────────────────────── */}
       <div className="border border-[#1c2232] bg-[#0c0e18] overflow-hidden">
-        <Table>
+        <Table style={{ tableLayout: "fixed", width: "100%" }}>
+          <colgroup>
+            <col style={{ width: colWidths[0] }} />
+            <col style={{ width: colWidths[1] }} />
+            <col />
+            <col style={{ width: 180 }} />
+          </colgroup>
           <TableHeader>
             <TableRow className="border-[#1c2232] hover:bg-transparent">
-              <TableHead className="font-mono text-[10px] tracking-[0.15em] text-[#3d4f60] uppercase py-3 px-5">{T.tpl_col_name}</TableHead>
-              <TableHead className="font-mono text-[10px] tracking-[0.15em] text-[#3d4f60] uppercase py-3">{T.tpl_col_desc}</TableHead>
+              {/* NOMBRE — resizable */}
+              <TableHead
+                className="font-mono text-[10px] tracking-[0.15em] text-[#3d4f60] uppercase py-3 px-5 relative select-none overflow-visible"
+                style={{ transition: isDraggingCol === 0 ? "none" : undefined }}
+              >
+                {T.tpl_col_name}
+                <div
+                  className="absolute right-0 top-0 bottom-0 w-[6px] cursor-col-resize z-10 group"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    isResizingCol.current = 0;
+                    resizeStartX.current = e.clientX;
+                    resizeStartWidth.current = colWidthsRef.current[0];
+                    setIsDraggingCol(0);
+                    document.body.style.cursor = "col-resize";
+                    document.body.style.userSelect = "none";
+                  }}
+                >
+                  <div className={`absolute inset-y-0 left-1/2 -translate-x-1/2 w-px transition-colors ${isDraggingCol === 0 ? "bg-[#00ff9d]/40" : "bg-transparent group-hover:bg-[#00ff9d]/25"}`} />
+                </div>
+              </TableHead>
+              {/* DESCRIPCIÓN — resizable */}
+              <TableHead
+                className="font-mono text-[10px] tracking-[0.15em] text-[#3d4f60] uppercase py-3 relative select-none overflow-visible"
+                style={{ transition: isDraggingCol === 1 ? "none" : undefined }}
+              >
+                {T.tpl_col_desc}
+                <div
+                  className="absolute right-0 top-0 bottom-0 w-[6px] cursor-col-resize z-10 group"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    isResizingCol.current = 1;
+                    resizeStartX.current = e.clientX;
+                    resizeStartWidth.current = colWidthsRef.current[1];
+                    setIsDraggingCol(1);
+                    document.body.style.cursor = "col-resize";
+                    document.body.style.userSelect = "none";
+                  }}
+                >
+                  <div className={`absolute inset-y-0 left-1/2 -translate-x-1/2 w-px transition-colors ${isDraggingCol === 1 ? "bg-[#00ff9d]/40" : "bg-transparent group-hover:bg-[#00ff9d]/25"}`} />
+                </div>
+              </TableHead>
               <TableHead className="font-mono text-[10px] tracking-[0.15em] text-[#3d4f60] uppercase py-3">{T.tpl_col_updated}</TableHead>
-              <TableHead className="w-[160px] text-right font-mono text-[10px] tracking-[0.15em] text-[#3d4f60] uppercase py-3 px-5">{T.tpl_col_actions}</TableHead>
+              <TableHead className="text-right font-mono text-[10px] tracking-[0.15em] text-[#3d4f60] uppercase py-3 px-5">{T.tpl_col_actions}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -555,7 +647,7 @@ export function TemplatesClient({ initialTemplates, lang = "es" }: { initialTemp
                       {template.name}
                     </Link>
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-[#5a7080] py-3 max-w-[200px] truncate">{template.description || "—"}</TableCell>
+                  <TableCell className="font-mono text-xs text-[#5a7080] py-3 truncate overflow-hidden">{template.description || "—"}</TableCell>
                   <TableCell className="font-mono text-xs text-[#5a7080] py-3" suppressHydrationWarning>
                     {formatDistanceToNow(new Date(template.updatedAt), { addSuffix: true, locale: lang === "es" ? esLocale : undefined })}
                   </TableCell>
