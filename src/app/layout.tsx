@@ -10,7 +10,18 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "BinStruct",
-  description: "SaaS application for Folder Structure and Template Management",
+  description: "Crea, organiza y exporta estructuras de carpetas para producción audiovisual y proyectos creativos. Templates reutilizables, exportación a ZIP y disco.",
+  openGraph: {
+    title: "BinStruct — Template Manager",
+    description: "Crea, organiza y exporta estructuras de carpetas para producción audiovisual y proyectos creativos.",
+    siteName: "BinStruct",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BinStruct — Template Manager",
+    description: "Crea, organiza y exporta estructuras de carpetas para producción audiovisual y proyectos creativos.",
+  },
 };
 
 export default function RootLayout({

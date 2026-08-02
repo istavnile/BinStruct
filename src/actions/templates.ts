@@ -68,6 +68,28 @@ export async function updateTemplate(id: string, name: string, description: stri
   return template;
 }
 
+export async function duplicateTemplate(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const workspaceId = (session.user as any).workspaceId;
+
+  const original = await db.template.findUnique({ where: { id, workspaceId } });
+  if (!original) throw new Error("Not found");
+
+  const copy = await db.template.create({
+    data: {
+      name: `${original.name} (copia)`,
+      description: original.description,
+      structure: original.structure as Prisma.InputJsonValue,
+      workspaceId,
+    },
+  });
+
+  revalidatePath("/templates");
+  return copy;
+}
+
 export async function deleteTemplate(id: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user) throw new Error("Unauthorized");

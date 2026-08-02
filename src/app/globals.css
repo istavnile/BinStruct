@@ -3,84 +3,89 @@
 @tailwind utilities;
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .text-balance { text-wrap: balance; }
+
+  /* CRT scanline texture — apply as a classname on overlay divs */
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0, 255, 157, 0.018) 2px,
+      rgba(0, 255, 157, 0.018) 3px
+    );
+    background-size: 100% 4px;
   }
 }
 
 @layer base {
+  /* ── Token palette ─────────────────────────────────────────────────────
+     Single dark theme. Both :root and .dark share the same values so the
+     app is always in hacking-dark mode regardless of the OS preference.
+  ──────────────────────────────────────────────────────────────────────── */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background:         223 31%  5%;    /* #080a0f */
+    --foreground:         209 22% 82%;    /* #c9d5e0 */
+    --card:               228 35%  7%;    /* #0c0e18 */
+    --card-foreground:    209 22% 82%;
+    --popover:            228 35%  7%;
+    --popover-foreground: 209 22% 82%;
+    --primary:            157 100% 50%;   /* #00ff9d — terminal green */
+    --primary-foreground: 223  31%  5%;
+    --secondary:          224  29% 15%;   /* #1c2232 */
+    --secondary-foreground: 209 22% 82%;
+    --muted:              225  25% 10%;
+    --muted-foreground:   209  22% 35%;   /* #3d4f60 */
+    --accent:             224  29% 15%;
+    --accent-foreground:  209  22% 82%;
+    --destructive:          0 100% 60%;   /* #ff3d3d */
+    --destructive-foreground: 223 31% 5%;
+    --border:             224  29% 15%;
+    --input:              224  29% 15%;
+    --ring:               157 100% 50%;
+    --radius:             0.125rem;       /* 2px — sharp, hardware feel */
+    --radius-md:          0.125rem;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background:         223 31%  5%;
+    --foreground:         209 22% 82%;
+    --card:               228 35%  7%;
+    --card-foreground:    209 22% 82%;
+    --popover:            228 35%  7%;
+    --popover-foreground: 209 22% 82%;
+    --primary:            157 100% 50%;
+    --primary-foreground: 223  31%  5%;
+    --secondary:          224  29% 15%;
+    --secondary-foreground: 209 22% 82%;
+    --muted:              225  25% 10%;
+    --muted-foreground:   209  22% 35%;
+    --accent:             224  29% 15%;
+    --accent-foreground:  209  22% 82%;
+    --destructive:          0 100% 60%;
+    --destructive-foreground: 223 31% 5%;
+    --border:             224  29% 15%;
+    --input:              224  29% 15%;
+    --ring:               157 100% 50%;
+    --radius:             0.125rem;
+    --radius-md:          0.125rem;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Terminal-green selection */
+  ::selection {
+    background: rgba(0, 255, 157, 0.18);
+    color: #00ff9d;
+  }
+
+  /* Slim dark scrollbars */
+  ::-webkit-scrollbar       { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(224 29% 18%);
+    border-radius: 0;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(224 29% 26%); }
 }

@@ -2,78 +2,77 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderTree, LayoutDashboard, Settings, LogOut, LayoutTemplate, ChevronRight } from "lucide-react";
+import { FolderTree, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
+import type { Lang } from "@/lib/lang";
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Templates", href: "/templates", icon: FolderTree },
-  { name: "Settings", href: "/settings", icon: Settings },
-];
+const NAV = {
+  es: [
+    { name: "Plantillas",     href: "/templates", icon: FolderTree, key: "templates" },
+    { name: "Configuración",  href: "/settings",  icon: Settings,   key: "settings"  },
+  ],
+  en: [
+    { name: "Templates", href: "/templates", icon: FolderTree, key: "templates" },
+    { name: "Settings",  href: "/settings",  icon: Settings,   key: "settings"  },
+  ],
+};
 
-export function Sidebar() {
+export function Sidebar({ lang = "es" }: { lang?: Lang }) {
   const pathname = usePathname();
+  const navigation = NAV[lang];
 
   return (
-    <div className="flex h-screen w-60 flex-col border-r border-white/5 bg-[#0a0a0f] px-3 py-5">
+    <aside className="relative flex h-screen w-56 shrink-0 flex-col border-r border-[#1c2232] bg-[#080a0f] overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-0 scanlines opacity-60 z-0" />
+
       {/* Logo */}
-      <div className="mb-8 flex items-center gap-2.5 px-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 shadow-md shadow-violet-500/20">
-          <LayoutTemplate className="h-4 w-4 text-white" />
+      <div className="relative z-10 flex items-center gap-3 border-b border-[#1c2232] px-5 py-4">
+        <div className="flex h-7 w-7 items-center justify-center border border-[#00ff9d]/40 bg-[#00ff9d]/5">
+          <span className="font-mono text-[10px] font-bold text-[#00ff9d] leading-none">BS</span>
         </div>
         <div>
-          <span className="text-sm font-bold tracking-tight text-white">BinStruct</span>
+          <span className="font-mono text-sm font-bold tracking-wider text-[#c9d5e0]">BINSTRUCT</span>
+          <p className="font-mono text-[9px] text-[#3d4f60] tracking-[0.15em]">v0.1.0</p>
         </div>
       </div>
 
-      {/* Nav label */}
-      <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
-        Navigation
-      </p>
-
-      {/* Nav items */}
-      <nav className="flex-1 space-y-0.5">
+      {/* Nav */}
+      <div className="relative z-10 flex-1 px-3 py-4 space-y-0.5">
+        <p className="font-mono text-[9px] font-bold tracking-[0.2em] text-[#3d4f60] px-2 mb-3">
+          // NAVIGATION
+        </p>
         {navigation.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
               className={cn(
-                "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
+                "group flex items-center gap-2.5 py-2 font-mono text-xs font-medium tracking-wide transition-all duration-100 border-l-2",
                 isActive
-                  ? "bg-violet-500/10 text-violet-300"
-                  : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                  ? "pl-[6px] pr-2 text-[#00ff9d] bg-[#00ff9d]/5 border-[#00ff9d]"
+                  : "pl-[6px] pr-2 text-[#3d4f60] border-transparent hover:text-[#c9d5e0] hover:bg-[#1c2232]/30"
               )}
             >
-              <item.icon
-                className={cn(
-                  "h-4 w-4 flex-shrink-0 transition-colors",
-                  isActive ? "text-violet-400" : "text-zinc-600 group-hover:text-zinc-400"
-                )}
-              />
-              {item.name}
-              {isActive && (
-                <ChevronRight className="ml-auto h-3 w-3 text-violet-400/60" />
-              )}
+              <item.icon className={cn("h-3.5 w-3.5 shrink-0", isActive ? "text-[#00ff9d]" : "text-[#3d4f60] group-hover:text-[#c9d5e0]")} />
+              <span>{item.name}</span>
+              {isActive && <span className="ml-auto font-mono text-[9px] text-[#00ff9d]/50">›</span>}
             </Link>
           );
         })}
-      </nav>
+      </div>
 
-      {/* Bottom divider + sign out */}
-      <div className="border-t border-white/5 pt-4">
+      {/* Sign out */}
+      <div className="relative z-10 border-t border-[#1c2232] px-3 py-3">
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-all hover:bg-red-500/10 hover:text-red-400"
+          className="group flex w-full items-center gap-2.5 py-2 pl-[6px] pr-2 font-mono text-xs font-medium tracking-wide text-[#3d4f60] transition-all duration-100 border-l-2 border-transparent hover:text-[#ff4545] hover:border-[#ff4545]/60 hover:bg-[#ff4545]/5"
         >
-          <LogOut className="h-4 w-4 flex-shrink-0 group-hover:text-red-400" />
-          Sign out
+          <LogOut className="h-3.5 w-3.5 shrink-0" />
+          <span>$ logout</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 }
