@@ -78,7 +78,7 @@ export function Sidebar({ lang = "es" }: { lang?: Lang }) {
           <span>{lang === "en" ? "help" : "ayuda"}</span>
         </button>
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={() => signOut({ callbackUrl: "/" })}
           className="group flex w-full items-center gap-2.5 py-2 pl-[6px] pr-2 font-mono text-xs font-medium tracking-wide text-[#3d4f60] transition-all duration-100 border-l-2 border-transparent hover:text-[#ff4545] hover:border-[#ff4545]/60 hover:bg-[#ff4545]/5"
         >
           <LogOut className="h-3.5 w-3.5 shrink-0" />
