@@ -57,7 +57,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(tree._id || null);
   const [isCreateOnDiskOpen, setIsCreateOnDiskOpen] = useState(false);
 
-  const [treeWidth, setTreeWidth] = useState(220);
+  const [treeWidth, setTreeWidth] = useState(280);
   const isResizing = useRef(false);
   const dragStartX = useRef(0);
   const dragStartWidth = useRef(0);
@@ -326,7 +326,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
       </div>
 
       {/* ── IDE layout ───────────────────────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden border-b border-[#1c2232]">
+      <div className="flex flex-1 overflow-hidden border-b border-[#1c2232] relative">
         {/* Tree panel */}
         <div className="shrink-0 border-r border-[#1c2232] bg-[#080a0f] flex flex-col" style={{ width: treeWidth }}>
           <div className="border-b border-[#1c2232] px-3 py-2 flex items-center justify-between">
@@ -344,9 +344,10 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
           </div>
         </div>
 
-        {/* Resize handle */}
+        {/* Resize handle — absolutely positioned over the border, zero layout width */}
         <div
-          className="w-[4px] shrink-0 cursor-col-resize group relative z-10 hover:bg-[#00ff9d]/10 active:bg-[#00ff9d]/15 transition-colors"
+          className="absolute top-0 bottom-0 w-[8px] -translate-x-1/2 cursor-col-resize z-20 hover:bg-[#00ff9d]/8 transition-colors"
+          style={{ left: treeWidth }}
           onMouseDown={(e) => {
             e.preventDefault();
             isResizing.current = true;
@@ -355,9 +356,7 @@ export function TemplateBuilderClient({ initialTemplate }: { initialTemplate: an
             document.body.style.cursor = "col-resize";
             document.body.style.userSelect = "none";
           }}
-        >
-          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-transparent group-hover:bg-[#00ff9d]/30 transition-colors" />
-        </div>
+        />
 
         {/* Editor panel */}
         <div className="flex-1 flex flex-col bg-[#0c0e18]">
